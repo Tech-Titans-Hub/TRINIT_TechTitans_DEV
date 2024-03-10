@@ -1,0 +1,54 @@
+// news_feed_page.dart
+import 'package:flutter/material.dart';
+import 'api_service.dart';
+
+class NewsFeedPage extends StatefulWidget {
+  @override
+  _NewsFeedPageState createState() => _NewsFeedPageState();
+}
+
+class _NewsFeedPageState extends State<NewsFeedPage> {
+  final ApiService _apiService = ApiService();
+  late List<Event> _events;
+
+  @override
+  void initState() {
+    super.initState();
+    _events = [];
+    _loadEvents();
+  }
+
+  Future<void> _loadEvents() async {
+    try {
+      List<Event> events = await _apiService.fetchEvents();
+      setState(() {
+        _events = events;
+      });
+    } catch (e) {
+      // Handle error
+      print('Error loading events: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('News Feed'),
+      ),
+      body: _buildNewsFeed(),
+    );
+  }
+
+  Widget _buildNewsFeed() {
+    return ListView.builder(
+      itemCount: _events.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(_events[index].title),
+          subtitle: Text(_events[index].description),
+        );
+      },
+    );
+  }
+}
